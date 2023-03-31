@@ -3,10 +3,25 @@ from rest_framework import serializers
 from .models import Car, Rims, RaceTracks, Owners, OwnersCars
 
 
+
+
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ['id', 'brand', 'mod', 'chasisNr', 'hp', 'yearOfRegistration']
+
+    def validate_hp(self, value):
+        if value < 2:
+            raise serializers.ValidationError("You need at least 2 hp for a car to move.")
+        else:
+            return value
+
+    def validate_yearOfRegistration(self, value):
+        if not(1875 > value > 2023):
+            raise serializers.ValidationError("You can't have a road legal car older than 1875 or newer than 2023.")
+        else:
+            return value
 
 
 class CarOwnerSerializer(serializers.ModelSerializer):
@@ -41,6 +56,12 @@ class RimsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rims
         fields = ['id', 'rimBrand', 'rimModel', 'height', 'width', 'carModel']
+
+    def validate_height(self, value):
+        if value < 10:
+            raise serializers.ValidationError("Wheels for a road car need to be at least 10 inch diameter.")
+        else:
+            return value
 
 
 class RaceTracksSerializer(serializers.ModelSerializer):

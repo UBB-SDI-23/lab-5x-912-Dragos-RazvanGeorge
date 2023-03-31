@@ -1,10 +1,11 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Car, Rims, RaceTracks, Owners, OwnersCars
 from .serializers import CarSerializer, RimsSerializer, RaceTracksSerializer, CarSerializerdetail, RimsSerializerDetail, \
     OwnersSerializer, OwnersCarsSerializer, CarOwnerSerializer, CarRimsSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django_filters import rest_framework as filters
@@ -32,6 +33,22 @@ def cars_list(request):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
+
+class MultipleRimsCarView(APIView):
+    @csrf_exempt
+    @api_view(['POST'])
+    def bulkAdd(request):
+        rim_id_new_brand_list = request.data.get('rims_id_new_brand_list')
+
+        # Loop through the list of car ids and new car brands to update
+        for item in rim_id_new_brand_list:
+            rim = Rims.objects.get(id=item['rims_id'])
+            rim.carModel = Car.objects.get(id=item['newcar'])
+            rim.save()
+
+        return Response({'message': 'Car brands updated successfully.'})
 
 @api_view(['GET', 'POST'])
 def owners_list(request):
@@ -79,6 +96,8 @@ def rims_list(request):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
 @api_view(['GET', 'POST'])

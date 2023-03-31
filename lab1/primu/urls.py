@@ -30,5 +30,6 @@ urlpatterns = [
     path('owners/<int:id>',views.owners_detail),
     path('ownerscars/<int:id>',views.ownersCars_detail),
     path('car_owner_report/',views.car_owner_report1, name='car_owner_report'),
+    path("multiplecarbrand/", views.MultipleRimsCarView.bulkAdd),
     path('car_rims_report/',views.car_rims_report1, name='car_rims_report')
 ]
