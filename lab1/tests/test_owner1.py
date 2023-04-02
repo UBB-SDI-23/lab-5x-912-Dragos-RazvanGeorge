@@ -20,3 +20,4 @@ class RaceTracksModelTestcase(TestCase):
         teacher = RaceTracks.objects.get(name="Razvan")
         expected_string = "Razvan"
         self.assertEqual(str(teacher), expected_string)
+
