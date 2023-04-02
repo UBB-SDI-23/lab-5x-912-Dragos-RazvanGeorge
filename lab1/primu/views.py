@@ -21,21 +21,23 @@ class RimsFilter(filters.FilterSet):
         }
 
 
-@api_view(['GET', 'POST'])
-def cars_list(request):
+class CarApiView(APIView):
     serializer_class = CarSerializer
-    if request.method == 'GET':
-        cars = Car.objects.all()
-        serializer = CarSerializer(cars, many=True)
-        return Response(serializer.data)
 
-    if request.method == 'POST':
-        serializer = CarSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors)
+    @api_view(['GET', 'POST'])
+    def cars_list(request):
+        if request.method == 'GET':
+            cars = Car.objects.all()
+            serializer = CarSerializer(cars, many=True)
+            return Response(serializer.data)
+
+        if request.method == 'POST':
+            serializer = CarSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors)
 
 
 class MultipleRimsCarView(APIView):
