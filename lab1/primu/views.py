@@ -23,6 +23,7 @@ class RimsFilter(filters.FilterSet):
 
 @api_view(['GET', 'POST'])
 def cars_list(request):
+    serializer_class = CarSerializer
     if request.method == 'GET':
         cars = Car.objects.all()
         serializer = CarSerializer(cars, many=True)
@@ -35,6 +36,7 @@ def cars_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors)
+
 
 class MultipleRimsCarView(APIView):
     @csrf_exempt
@@ -50,8 +52,10 @@ class MultipleRimsCarView(APIView):
 
         return Response({'message': 'Car brands updated successfully.'})
 
+
 @api_view(['GET', 'POST'])
 def owners_list(request):
+    serializer_class = OwnersSerializer
     if request.method == 'GET':
         cars = Owners.objects.all()
         serializer = OwnersSerializer(cars, many=True)
@@ -63,8 +67,10 @@ def owners_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET', 'POST'])
 def ownersCars_list(request):
+    serializer_class = OwnersCarsSerializer
     if request.method == 'GET':
         cars = OwnersCars.objects.all()
         serializer = OwnersCarsSerializer(cars, many=True)
@@ -79,13 +85,14 @@ def ownersCars_list(request):
 
 @api_view(['GET', 'POST'])
 def rims_list(request):
+    serializer_class = RimsSerializer
     id = request.query_params.get('id')
     height1 = request.query_params.get('height')
     if request.method == 'GET':
         if id:
-            rims = Rims.objects.filter(id = id)
-        elif height1 :
-            rims = Rims.objects.filter(height__gt = height1)
+            rims = Rims.objects.filter(id=id)
+        elif height1:
+            rims = Rims.objects.filter(height__gt=height1)
         else:
             rims = Rims.objects.all()
         serializer = RimsSerializer(rims, many=True)
@@ -102,6 +109,7 @@ def rims_list(request):
 
 @api_view(['GET', 'POST'])
 def racetracks_list(request):
+    serializer_class = RaceTracksSerializer
     if request.method == 'GET':
         cars = RaceTracks.objects.all()
         serializer = RaceTracksSerializer(cars, many=True)
@@ -116,6 +124,7 @@ def racetracks_list(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def car_detail(request, id):
+    # serializer_class = CarSerializer
     try:
         car = Car.objects.get(pk=id)
     except Car.DoesNotExist:
@@ -136,8 +145,10 @@ def car_detail(request, id):
         car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def owners_detail(request, id):
+    serializer_class = OwnersSerializer
     try:
         car = Owners.objects.get(pk=id)
     except Owners.DoesNotExist:
@@ -158,8 +169,10 @@ def owners_detail(request, id):
         car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def ownersCars_detail(request, id):
+    serializer_class = OwnersCarsSerializer
     try:
         car = OwnersCars.objects.get(pk=id)
     except OwnersCars.DoesNotExist:
@@ -183,6 +196,7 @@ def ownersCars_detail(request, id):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def rims_detail(request, id):
+    # serializer_class = RimsSerializer
     try:
         car = Rims.objects.get(pk=id)
     except Rims.DoesNotExist:
@@ -206,6 +220,7 @@ def rims_detail(request, id):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def racetracks_detail(request, id):
+    serializer_class = RaceTracksSerializer
     try:
         car = RaceTracks.objects.get(pk=id)
     except RaceTracks.DoesNotExist:
@@ -226,6 +241,7 @@ def racetracks_detail(request, id):
         car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 def car_owner_report(request):
     owners = Owners.objects.annotate(num_cars=Count('ownerscars'))
 
@@ -234,22 +250,27 @@ def car_owner_report(request):
     context = {'owners': owners}
     return render(request, 'owner_report.html', context)
 
+
 def car_rims_report(request):
     cars = Car.objects.annotate(num_cars=Count('rims'))
     cars = cars.order_by('-num_cars')
     context = {'cars': cars}
-    return render(request,'car_report.html',context)
+    return render(request, 'car_report.html', context)
+
 
 @api_view(['GET', 'POST'])
 def car_owner_report1(request):
+    serializer_class = CarOwnerSerializer
     if request.method == 'GET':
         owners = Owners.objects.annotate(num_cars=Count('ownerscars'))
         owners = owners.order_by('-num_cars')
         serializer = CarOwnerSerializer(owners, many=True)
         return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
 def car_rims_report1(request):
+    serializer_class = CarRimsSerializer
     if request.method == 'GET':
         cars = Car.objects.annotate(num_rims=Count('rims'))
         cars = cars.order_by('-num_rims')
