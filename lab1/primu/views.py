@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import extend_schema
 
 from .models import Car, Rims, RaceTracks, Owners, OwnersCars
 from .serializers import CarSerializer, RimsSerializer, RaceTracksSerializer, CarSerializerdetail, RimsSerializerDetail, \
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django_filters import rest_framework as filters
 from django.db.models import Count
+from rest_framework.views import APIView
 
 
 class RimsFilter(filters.FilterSet):
@@ -22,8 +24,7 @@ class RimsFilter(filters.FilterSet):
 
 
 class CarApiView(APIView):
-    serializer_class = CarSerializer
-
+    @extend_schema(responses={201: CarSerializer}, )
     @api_view(['GET', 'POST'])
     def cars_list(request):
         if request.method == 'GET':
