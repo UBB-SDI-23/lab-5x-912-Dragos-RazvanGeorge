@@ -20,16 +20,16 @@ from primu import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cars/',views.CarApiView.as_view()),
-    path('cars/<int:id>',views.car_detail),
-    path('rims/',views.rims_list),
-    path('racetracks/',views.racetracks_list),
-    path('rims/<int:id>',views.rims_detail),
-    path('racetracks/<int:id>',views.racetracks_detail),
-    path('owners/',views.owners_list),
-    path('ownerscars/',views.ownersCars_list),
-    path('owners/<int:id>',views.owners_detail),
-    path('ownerscars/<int:id>',views.ownersCars_detail),
-    path('car_owner_report/',views.car_owner_report1, name='car_owner_report'),
+    path('cars/<int:id>',views.CarDetailView.as_view()),
+    path('rims/',views.RimsApiView.as_view()),
+    path('racetracks/',views.RaceTracksApiView.as_view()),
+    path('rims/<int:id>',views.RimsDetailApiView.as_view()),
+    path('racetracks/<int:id>',views.RaceTrackDetailApiView.as_view()),
+    path('owners/',views.OwnersApiView.as_view()),
+    path('ownerscars/',views.OwnersCarsApiView.as_view()),
+    path('owners/<int:id>',views.OwnersDetailView.as_view()),
+    path('ownerscars/<int:id>',views.OwnersCarsDetailApiView.as_view()),
+    path('car_owner_report/',views.CarOwnerReport1ApiView.as_view(), name='car_owner_report'),
     path("multiplecarbrand/", views.MultipleRimsCarView.bulkAdd),
-    path('car_rims_report/',views.car_rims_report1, name='car_rims_report')
+    path('car_rims_report/',views.CarRimsReport1ApiView.as_view(), name='car_rims_report')
 ]

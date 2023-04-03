@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from .models import Car, Rims, RaceTracks, Owners, OwnersCars
 from .serializers import CarSerializer, RimsSerializer, RaceTracksSerializer, CarSerializerdetail, RimsSerializerDetail, \
@@ -23,6 +23,7 @@ class RimsFilter(filters.FilterSet):
             'height': ['gte']
         }
 
+
 """
 class CarApiView(GenericAPIView):
     @extend_schema(responses={201: CarSerializer}, )
@@ -41,6 +42,8 @@ class CarApiView(GenericAPIView):
             else:
                 return Response(serializer.errors)
                 """
+
+
 class CarApiView(APIView):
     @extend_schema(responses={201: CarSerializer}, )
     def get(self, request):
@@ -58,7 +61,6 @@ class CarApiView(APIView):
             return Response(serializer.errors)
 
 
-
 class MultipleRimsCarView(APIView):
     @csrf_exempt
     @api_view(['POST'])
@@ -74,6 +76,9 @@ class MultipleRimsCarView(APIView):
         return Response({'message': 'Cars updated successfully.'})
 
 
+
+
+"""
 @api_view(['GET', 'POST'])
 def owners_list(request):
     serializer_class = OwnersSerializer
@@ -86,9 +91,27 @@ def owners_list(request):
         serializer = OwnersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)"""
+
+
+class OwnersApiView(APIView):
+    @extend_schema(responses={200: OwnersSerializer(many=True)})
+    def get(self, request):
+        owners = Owners.objects.all()
+        serializer = OwnersSerializer(owners, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(request=OwnersSerializer, responses={201: OwnersSerializer})
+    def post(self, request):
+        serializer = OwnersSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
+"""
 @api_view(['GET', 'POST'])
 def ownersCars_list(request):
     serializer_class = OwnersCarsSerializer
@@ -101,9 +124,27 @@ def ownersCars_list(request):
         serializer = OwnersCarsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)"""
+
+
+class OwnersCarsApiView(APIView):
+    @extend_schema(responses={200: OwnersCarsSerializer(many=True)}, )
+    def get(self, request):
+        cars = OwnersCars.objects.all()
+        serializer = OwnersCarsSerializer(cars, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(request=OwnersCarsSerializer, responses={201: OwnersCarsSerializer()})
+    def post(self, request):
+        serializer = OwnersCarsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
+"""
 @api_view(['GET', 'POST'])
 def rims_list(request):
     serializer_class = RimsSerializer
@@ -125,9 +166,36 @@ def rims_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
+            return Response(serializer.errors)"""
+
+
+class RimsApiView(APIView):
+    @extend_schema(parameters=[OpenApiParameter(name='id', type=int, required=False),
+                               OpenApiParameter(name='height', type=int, required=False)],
+                   responses={200: RimsSerializer(many=True)})
+    def get(self, request):
+        id = request.query_params.get('id')
+        height1 = request.query_params.get('height')
+        if id:
+            rims = Rims.objects.filter(id=id)
+        elif height1:
+            rims = Rims.objects.filter(height__gt=height1)
+        else:
+            rims = Rims.objects.all()
+        serializer = RimsSerializer(rims, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(request=RimsSerializer, responses={201: RimsSerializer})
+    def post(self, request):
+        serializer = RimsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
             return Response(serializer.errors)
 
 
+"""
 @api_view(['GET', 'POST'])
 def racetracks_list(request):
     serializer_class = RaceTracksSerializer
@@ -140,9 +208,27 @@ def racetracks_list(request):
         serializer = RaceTracksSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)"""
+
+
+class RaceTracksApiView(APIView):
+    @extend_schema(responses={200: RaceTracksSerializer(many=True)})
+    def get(self, request):
+        cars = RaceTracks.objects.all()
+        serializer = RaceTracksSerializer(cars, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(request=RaceTracksSerializer, responses={201: RaceTracksSerializer})
+    def post(self, request):
+        serializer = RaceTracksSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
+"""
 @api_view(['GET', 'PUT', 'DELETE'])
 def car_detail(request, id):
     # serializer_class = CarSerializer
@@ -164,9 +250,42 @@ def car_detail(request, id):
 
     elif request.method == 'DELETE':
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)"""
+
+
+class CarDetailView(APIView):
+    @extend_schema(responses={200: CarSerializer})
+    def get(self, request, id):
+        try:
+            car = Car.objects.get(pk=id)
+        except Car.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = CarSerializer(car)
+        return Response(serializer.data)
+
+    @extend_schema(request=CarSerializer, responses={200: CarSerializer})
+    def put(self, request, id):
+        try:
+            car = Car.objects.get(pk=id)
+        except Car.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = CarSerializer(car, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: "No Content"})
+    def delete(self, request, id):
+        try:
+            car = Car.objects.get(pk=id)
+        except Car.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+"""
 @api_view(['GET', 'PUT', 'DELETE'])
 def owners_detail(request, id):
     serializer_class = OwnersSerializer
@@ -188,9 +307,42 @@ def owners_detail(request, id):
 
     elif request.method == 'DELETE':
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)"""
+
+
+class OwnersDetailView(APIView):
+    @extend_schema(responses={200: OwnersSerializer})
+    def get(self, request, id):
+        try:
+            owner = Owners.objects.get(pk=id)
+        except Owners.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = OwnersSerializer(owner)
+        return Response(serializer.data)
+
+    @extend_schema(request=OwnersSerializer, responses={200: OwnersSerializer})
+    def put(self, request, id):
+        try:
+            owner = Owners.objects.get(pk=id)
+        except Owners.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = OwnersSerializer(owner, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: 'No Content'})
+    def delete(self, request, id):
+        try:
+            owner = Owners.objects.get(pk=id)
+        except Owners.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        owner.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+"""
 @api_view(['GET', 'PUT', 'DELETE'])
 def ownersCars_detail(request, id):
     serializer_class = OwnersCarsSerializer
@@ -212,9 +364,45 @@ def ownersCars_detail(request, id):
 
     elif request.method == 'DELETE':
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)"""
+
+
+class OwnersCarsDetailApiView(APIView):
+    @extend_schema(responses={200: OwnersCarsSerializer})
+    def get(self, request, id):
+        try:
+            car = OwnersCars.objects.get(pk=id)
+        except OwnersCars.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OwnersCarsSerializer(car)
+        return Response(serializer.data)
+
+    @extend_schema(request=OwnersCarsSerializer, responses={200: OwnersCarsSerializer})
+    def put(self, request, id):
+        try:
+            car = OwnersCars.objects.get(pk=id)
+        except OwnersCars.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OwnersCarsSerializer(car, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: 'No Content'})
+    def delete(self, request, id):
+        try:
+            car = OwnersCars.objects.get(pk=id)
+        except OwnersCars.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+"""
 @api_view(['GET', 'PUT', 'DELETE'])
 def rims_detail(request, id):
     # serializer_class = RimsSerializer
@@ -236,9 +424,45 @@ def rims_detail(request, id):
 
     elif request.method == 'DELETE':
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)"""
+
+
+class RimsDetailApiView(APIView):
+    @extend_schema(responses={200: RimsSerializerDetail})
+    def get(self, request, id):
+        try:
+            rim = Rims.objects.get(pk=id)
+        except Rims.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RimsSerializerDetail(rim)
+        return Response(serializer.data)
+
+    @extend_schema(request=RimsSerializer, responses={200: RimsSerializer})
+    def put(self, request, id):
+        try:
+            rim = Rims.objects.get(pk=id)
+        except Rims.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RimsSerializer(rim, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: 'No Content'})
+    def delete(self, request, id):
+        try:
+            rim = Rims.objects.get(pk=id)
+        except Rims.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        rim.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+"""
 @api_view(['GET', 'PUT', 'DELETE'])
 def racetracks_detail(request, id):
     serializer_class = RaceTracksSerializer
@@ -260,9 +484,45 @@ def racetracks_detail(request, id):
 
     elif request.method == 'DELETE':
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)"""
+
+
+class RaceTrackDetailApiView(APIView):
+    @extend_schema(responses={200: RaceTracksSerializer})
+    def get(self, request, id):
+        try:
+            track = RaceTracks.objects.get(pk=id)
+        except RaceTracks.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RaceTracksSerializer(track)
+        return Response(serializer.data)
+
+    @extend_schema(request=RaceTracksSerializer, responses={200: RaceTracksSerializer})
+    def put(self, request, id):
+        try:
+            track = RaceTracks.objects.get(pk=id)
+        except RaceTracks.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RaceTracksSerializer(track, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: 'No Content'})
+    def delete(self, request, id):
+        try:
+            track = RaceTracks.objects.get(pk=id)
+        except RaceTracks.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        track.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+"""
 def car_owner_report(request):
     owners = Owners.objects.annotate(num_cars=Count('ownerscars'))
 
@@ -277,22 +537,39 @@ def car_rims_report(request):
     cars = cars.order_by('-num_cars')
     context = {'cars': cars}
     return render(request, 'car_report.html', context)
-
-
+"""
+"""
 @api_view(['GET', 'POST'])
 def car_owner_report1(request):
     serializer_class = CarOwnerSerializer
     if request.method == 'GET':
         owners = Owners.objects.annotate(num_cars=Count('ownerscars'))
         owners = owners.order_by('-num_cars')
+        serializer = CarOwnerSerializer(owners, many=True) 
+        return Response(serializer.data)"""
+
+
+class CarOwnerReport1ApiView(APIView):
+    @extend_schema(responses={200: CarOwnerSerializer(many=True)})
+    def get(self, request):
+        owners = Owners.objects.annotate(num_cars=Count('ownerscars')).order_by('-num_cars')
         serializer = CarOwnerSerializer(owners, many=True)
         return Response(serializer.data)
 
-
+"""
 @api_view(['GET', 'POST'])
 def car_rims_report1(request):
     serializer_class = CarRimsSerializer
     if request.method == 'GET':
+        cars = Car.objects.annotate(num_rims=Count('rims'))
+        cars = cars.order_by('-num_rims')
+        serializer = CarRimsSerializer(cars, many=True)
+        return Response(serializer.data)"""
+
+
+class CarRimsReport1ApiView(APIView):
+    @extend_schema(responses={200: CarRimsSerializer(many=True)})
+    def get(self, request):
         cars = Car.objects.annotate(num_rims=Count('rims'))
         cars = cars.order_by('-num_rims')
         serializer = CarRimsSerializer(cars, many=True)
