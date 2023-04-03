@@ -75,7 +75,7 @@ class MultipleRimsCarView(APIView):
             rim.save()
 
         return Response({'message': 'Cars updated successfully.'})"""
-
+"""
 class MultipleRimsCarView(APIView):
     serializer_class = RimsSerializer
 
@@ -90,7 +90,31 @@ class MultipleRimsCarView(APIView):
             rim.carModel = Car.objects.get(id=item['newcar'])
             rim.save()
 
+        return Response({'message': 'Cars updated successfully.'})"""
+
+class MultipleRimsCarView(APIView):
+    @csrf_exempt
+    @extend_schema(request={"type": "object",
+                             "properties": {"rims_id_new_brand_list": {"type": "array",
+                                                                       "items": {"type": "object",
+                                                                                 "properties": {"rims_id": {"type": "integer"},
+                                                                                                "newcar": {"type": "integer"}}
+                                                                       }
+                                                                      }
+                                            },
+                             },
+                   responses={200: {"description": "Cars updated successfully"}})
+    def post(self, request):
+        rim_id_new_brand_list = request.data.get('rims_id_new_brand_list')
+
+        # Loop through the list of car ids and new car brands to update
+        for item in rim_id_new_brand_list:
+            rim = Rims.objects.get(id=item['rims_id'])
+            rim.carModel = Car.objects.get(id=item['newcar'])
+            rim.save()
+
         return Response({'message': 'Cars updated successfully.'})
+
 
 
 

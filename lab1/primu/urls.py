@@ -30,6 +30,6 @@ urlpatterns = [
     path('owners/<int:id>',views.OwnersDetailView.as_view()),
     path('ownerscars/<int:id>',views.OwnersCarsDetailApiView.as_view()),
     path('car_owner_report/',views.CarOwnerReport1ApiView.as_view(), name='car_owner_report'),
-    path("multiplecarbrand/", views.MultipleRimsCarView.bulkAdd),
+    path("multiplecarbrand/", views.MultipleRimsCarView.as_view()),
     path('car_rims_report/',views.CarRimsReport1ApiView.as_view(), name='car_rims_report')
 ]
