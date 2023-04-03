@@ -19,7 +19,7 @@ from primu import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('cars/',views.CarApiView.cars_list),
+    path('cars/',views.CarApiView.as_view()),
     path('cars/<int:id>',views.car_detail),
     path('rims/',views.rims_list),
     path('racetracks/',views.racetracks_list),

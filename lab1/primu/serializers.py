@@ -3,9 +3,6 @@ from rest_framework import serializers
 from .models import Car, Rims, RaceTracks, Owners, OwnersCars
 
 
-
-
-
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
@@ -18,7 +15,7 @@ class CarSerializer(serializers.ModelSerializer):
             return value
 
     def validate_yearOfRegistration(self, value):
-        if not(1875 > value > 2023):
+        if 1875 > value or 2023 < value:
             raise serializers.ValidationError("You can't have a road legal car older than 1875 or newer than 2023.")
         else:
             return value
