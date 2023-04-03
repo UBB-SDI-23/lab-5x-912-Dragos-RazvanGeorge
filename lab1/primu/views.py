@@ -62,6 +62,7 @@ class CarApiView(APIView):
 
 
 class MultipleRimsCarView(APIView):
+    serializer_class = None
     @csrf_exempt
     @api_view(['POST'])
     def bulkAdd(request):
