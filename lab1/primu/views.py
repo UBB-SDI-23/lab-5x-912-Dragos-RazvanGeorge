@@ -12,6 +12,7 @@ from rest_framework import status
 from django_filters import rest_framework as filters
 from django.db.models import Count
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 
 
 class RimsFilter(filters.FilterSet):
@@ -22,8 +23,8 @@ class RimsFilter(filters.FilterSet):
             'height': ['gte']
         }
 
-
-class CarApiView(APIView):
+"""
+class CarApiView(GenericAPIView):
     @extend_schema(responses={201: CarSerializer}, )
     @api_view(['GET', 'POST'])
     def cars_list(request):
@@ -39,6 +40,23 @@ class CarApiView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors)
+                """
+class CarApiView(APIView):
+    @extend_schema(responses={201: CarSerializer}, )
+    def get(self, request):
+        cars = Car.objects.all()
+        serializer = CarSerializer(cars, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(request=CarSerializer, responses={201: CarSerializer})
+    def post(self, request):
+        serializer = CarSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
+
 
 
 class MultipleRimsCarView(APIView):
@@ -53,7 +71,7 @@ class MultipleRimsCarView(APIView):
             rim.carModel = Car.objects.get(id=item['newcar'])
             rim.save()
 
-        return Response({'message': 'Car brands updated successfully.'})
+        return Response({'message': 'Cars updated successfully.'})
 
 
 @api_view(['GET', 'POST'])
