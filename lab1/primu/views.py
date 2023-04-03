@@ -60,7 +60,7 @@ class CarApiView(APIView):
         else:
             return Response(serializer.errors)
 
-
+"""
 class MultipleRimsCarView(APIView):
     serializer_class = None
     @csrf_exempt
@@ -74,7 +74,24 @@ class MultipleRimsCarView(APIView):
             rim.carModel = Car.objects.get(id=item['newcar'])
             rim.save()
 
+        return Response({'message': 'Cars updated successfully.'})"""
+
+class MultipleRimsCarView(APIView):
+    serializer_class = RimsSerializer
+
+    @csrf_exempt
+    @api_view(['POST'])
+    def bulkAdd(request):
+        rim_id_new_brand_list = request.data.get('rims_id_new_brand_list')
+
+        # Loop through the list of car ids and new car brands to update
+        for item in rim_id_new_brand_list:
+            rim = Rims.objects.get(id=item['rims_id'])
+            rim.carModel = Car.objects.get(id=item['newcar'])
+            rim.save()
+
         return Response({'message': 'Cars updated successfully.'})
+
 
 
 
