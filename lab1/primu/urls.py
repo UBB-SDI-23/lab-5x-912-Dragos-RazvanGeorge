@@ -18,6 +18,7 @@ from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 from primu import views
+from primu.viewsFolder import CarViews, OwnerViews, OwnerCarsView, RimsViews, RaceTracksView
 
 urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -25,17 +26,17 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('admin/', admin.site.urls),
-    path('cars/',views.CarApiView.as_view()),
-    path('cars/<int:id>',views.CarDetailView.as_view()),
-    path('rims/',views.RimsApiView.as_view()),
-    path('racetracks/',views.RaceTracksApiView.as_view()),
-    path('rims/<int:id>',views.RimsDetailApiView.as_view()),
-    path('racetracks/<int:id>',views.RaceTrackDetailApiView.as_view()),
-    path('owners/',views.OwnersApiView.as_view()),
-    path('ownerscars/',views.OwnersCarsApiView.as_view()),
-    path('owners/<int:id>',views.OwnersDetailView.as_view()),
-    path('ownerscars/<int:id>',views.OwnersCarsDetailApiView.as_view()),
-    path('car_owner_report/',views.CarOwnerReport1ApiView.as_view(), name='car_owner_report'),
-    path("multiplecarbrand/", views.MultipleRimsCarView.as_view()),
-    path('car_rims_report/',views.CarRimsReport1ApiView.as_view(), name='car_rims_report')
+    path('cars/',CarViews.CarApiView.as_view()),
+    path('cars/<int:id>',CarViews.CarDetailView.as_view()),
+    path('rims/',RimsViews.RimsApiView.as_view()),
+    path('racetracks/',RaceTracksView.RaceTracksApiView.as_view()),
+    path('rims/<int:id>',RimsViews.RimsDetailApiView.as_view()),
+    path('racetracks/<int:id>',RaceTracksView.RaceTrackDetailApiView.as_view()),
+    path('owners/',OwnerViews.OwnersApiView.as_view()),
+    path('ownerscars/',OwnerCarsView.OwnersCarsApiView.as_view()),
+    path('owners/<int:id>',OwnerViews.OwnersDetailView.as_view()),
+    path('ownerscars/<int:id>',OwnerCarsView.OwnersCarsDetailApiView.as_view()),
+    path('car_owner_report/',OwnerCarsView.CarOwnerReport1ApiView.as_view(), name='car_owner_report'),
+    path("multiplecarbrand/", RimsViews.MultipleRimsCarView.as_view()),
+    path('car_rims_report/',CarViews.CarRimsReport1ApiView.as_view(), name='car_rims_report')
 ]
