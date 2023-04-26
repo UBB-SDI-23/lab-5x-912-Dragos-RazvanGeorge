@@ -6,15 +6,26 @@ from primu.serializers import CarSerializer, CarRimsSerializer
 from rest_framework.response import Response
 
 from primu.models import Car
-from rest_framework import status
+from rest_framework import status, generics
 
 
 class CarApiView(APIView):
     @extend_schema(responses={201: CarSerializer}, )
-    def get(self, request):
-        cars = Car.objects.all()
+    def get(self, request, page=None):
+        id = request.query_params.get("id", None)
+        if id is not None:
+            try:
+                car = Car.objects.get(pk=id)
+            except Car.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            serializer = CarSerializer(car)
+            return Response({"data": serializer.data, "totalRows": Car.objects.count()})
+        if page is None:
+            page = 0
+        offset = 10
+        cars = Car.objects.all().order_by("id")[page * offset:(page + 1) * offset]
         serializer = CarSerializer(cars, many=True)
-        return Response(serializer.data)
+        return Response({"data": serializer.data, "totalRows": Car.objects.count()})
 
     @extend_schema(request=CarSerializer, responses={201: CarSerializer})
     def post(self, request):
@@ -25,10 +36,35 @@ class CarApiView(APIView):
         else:
             return Response(serializer.errors)
 
+    @extend_schema(request=CarSerializer, responses={200: CarSerializer})
+    def put(self, request):
+        id = request.query_params.get("id", None)
+        try:
+            car = Car.objects.get(pk=id)
+        except Car.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = CarSerializer(car, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: "No Content"})
+    def delete(self, request):
+        id = request.query_params.get("id", None)
+        try:
+            car = Car.objects.get(pk=id)
+        except Car.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CarDetailView(APIView):
     @extend_schema(responses={200: CarSerializer})
-    def get(self, request, id):
+    def get(self, request, page):
+
+        id = request.query_params.get("id", None)
         try:
             car = Car.objects.get(pk=id)
         except Car.DoesNotExist:
@@ -37,7 +73,9 @@ class CarDetailView(APIView):
         return Response(serializer.data)
 
     @extend_schema(request=CarSerializer, responses={200: CarSerializer})
-    def put(self, request, id):
+    def put(self, request, page):
+        id = request.query_params.get("id", None)
+
         try:
             car = Car.objects.get(pk=id)
         except Car.DoesNotExist:
@@ -65,3 +103,14 @@ class CarRimsReport1ApiView(APIView):
         cars = cars.order_by('-num_rims')
         serializer = CarRimsSerializer(cars, many=True)
         return Response(serializer.data)
+
+
+class CarOrdByBrandApiView(generics.ListCreateAPIView):
+    serializer_class = CarSerializer
+
+    def get_queryset(self):
+        car_brand = self.kwargs.get("car_brand")
+        query_set = Car.objects.all()
+        if car_brand is not None:
+            query_set = query_set.filter(brand__icontains=car_brand)
+            return query_set[:10]

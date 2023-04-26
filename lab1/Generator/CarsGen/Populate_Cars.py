@@ -13,7 +13,7 @@ if __name__ == '__main__':
     original_stdout = sys.stdout
 
 
-    for i in range(step):
+    for i in range(1):
         with open(f"{file_prefix}{i}{file_suffix}", "w") as file:
             sys.stdout = file
             print(header)

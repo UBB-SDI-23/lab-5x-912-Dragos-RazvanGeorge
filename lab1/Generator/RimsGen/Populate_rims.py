@@ -4,7 +4,7 @@ from faker import Faker
 
 if __name__ == '__main__':
     fake = Faker()
-    step = 2
+    step = 100
     brands = ['BBS','Vossen','Z','OZ','Venom']
     header = "insert into primu_rims(\"rimBrand\", \"rimModel\", height, width, \"carModel_id\") VALUES"
     file_prefix = "rims_"
@@ -13,13 +13,13 @@ if __name__ == '__main__':
     original_stdout = sys.stdout
 
 
-    for i in range(step):
+    for i in range(1):
         with open(f"{file_prefix}{i}{file_suffix}", "w") as file:
             sys.stdout = file
             print(header)
             for j in range(step):
                 print(
-                    f"('{random.choice(brands)}','{fake.word()}',{random.randint(14,28)},{random.randint(100,300)},{random.randint(1,999999)})",
+                    f"('{random.choice(brands)}','{fake.word()}',{random.randint(14,28)},{random.randint(100,300)},{random.randint(1,50)})",
                     end='')
 
                 if j != step - 1:

@@ -4,7 +4,7 @@ from faker import Faker
 
 if __name__ == '__main__':
     fake = Faker()
-    step = 2
+    step = 1000
     header = "insert into primu_owners(name, addres, cnp) VALUES"
     file_prefix = "owner_"
     file_suffix = ".sql"
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     original_stdout = sys.stdout
 
 
-    for i in range(step):
+    for i in range(10):
         with open(f"{file_prefix}{i}{file_suffix}", "w") as file:
             sys.stdout = file
             print(header)
