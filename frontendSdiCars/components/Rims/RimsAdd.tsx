@@ -10,7 +10,8 @@ import axios from "axios";
 import { DEV_BACKEND_API_URL } from "../../constants"
 import { Car } from "../../models/Cars";
 import { debounce } from "lodash";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 export const RimsAdd = () => {
@@ -61,9 +62,13 @@ export const RimsAdd = () => {
 	const addCar = async (event: { preventDefault: () => void }) => {
 		event.preventDefault();
 		try {
+			if(car.height>25 || car.height<10){
+				throw new Error("You can't have a road legal car with heigher than 25 wheels or lower than 10");
+			}
 			await axios.post(`${DEV_BACKEND_API_URL}/rims/`, car);
 			navigate("/rims");
 		} catch (error) {
+			toast.error((error as { message: string }).message);
 			console.log(error);
 		}
 	};
@@ -124,6 +129,7 @@ export const RimsAdd = () => {
 							}}
 							
 						/>
+						<ToastContainer/>
 						<Button type="submit">Add Rim</Button>
 					</form>
 				</CardContent>

@@ -26,6 +26,7 @@ import { OwnersCarsShowAll } from './components/OwnersCars/OwersCarsShowAll'
 import { OwnersCarsAdd } from './components/OwnersCars/OwnersCarsAdd'
 import { OwnersCarsUpdate } from './components/OwnersCars/OwnersCarsUpdate'
 import { OwnersCarsDelete } from './components/OwnersCars/OwnersCarsDelete'
+import { CarRims } from './components/Statistics/CarsRimsReport'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -54,6 +55,7 @@ function App() {
           <Route path="/ownerscars/add" element={<OwnersCarsAdd/>}/>
           <Route path="/ownerscars/:carId/edit" element={<OwnersCarsUpdate />} />
           <Route path="/ownerscars/:carId/delete" element={<OwnersCarsDelete/>}/>
+          <Route path="/car_rims_report" element={<CarRims/>}></Route>
         </Routes>
       </Router>
     </React.Fragment>

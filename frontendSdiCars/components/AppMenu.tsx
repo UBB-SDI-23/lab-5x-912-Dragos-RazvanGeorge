@@ -94,6 +94,17 @@ import {
      
                 OwnersCars
               </Button>
+              <Button
+                variant={path.startsWith("/car_rims_report") ? "outlined" : "text"}
+                to="/car_rims_report"
+                component={Link}
+                color="inherit"
+                sx={{ mr: 5 }}
+                startIcon={<PieChartIcon></PieChartIcon>}
+              >
+
+                Car Rims - Statistic
+              </Button>
             </Toolbar>
           </AppBar>
         </Box>
